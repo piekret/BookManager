@@ -1,10 +1,11 @@
 package com.example.bookmanager.data.model
 
 data class Book(
-    val workId: String,
+    val id: String,
     val title: String,
-    val authors: String,
+    val author: String,
     val coverId: Int?,
-    val firstPublishYear: Int?,
+    val publishYear: Int?,
+    val publishDate: String?,
     val description: String? = null
 )
