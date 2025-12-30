@@ -32,6 +32,12 @@ class FavoriteManager(context: Context) {
         preferences.edit { putStringSet(key, curr) }
     }
 
+    fun findById(id: String): Book? {
+        return (preferences.getStringSet(key, emptySet()) ?: emptySet())
+            .firstOrNull() { it.startsWith("$id|") }
+            ?.let { decode(it) }
+    }
+
     private fun encode(book: Book): String {
         val title = Uri.encode(book.title)
         val author = Uri.encode(book.author)
