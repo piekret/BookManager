@@ -6,7 +6,7 @@ import com.example.bookmanager.data.model.Book
 import androidx.core.content.edit
 
 class FavoriteManager(context: Context) {
-    private val preferences = context.getSharedPreferences("favorites",Context.MODE_PRIVATE)
+    private val preferences = context.getSharedPreferences("favorites", Context.MODE_PRIVATE)
     private val key = "favorite_books"
 
     fun getFavorites(): List<Book> {
@@ -16,7 +16,7 @@ class FavoriteManager(context: Context) {
     }
 
     fun isFavorite(id: String): Boolean {
-        return preferences.getStringSet(key, emptySet())?.contains(id) ?: false
+        return preferences.getStringSet(key, emptySet())?.any { it.startsWith("$id|") } ?: false
     }
 
     fun addFavorite(book: Book) {
@@ -34,29 +34,28 @@ class FavoriteManager(context: Context) {
 
     fun findById(id: String): Book? {
         return (preferences.getStringSet(key, emptySet()) ?: emptySet())
-            .firstOrNull() { it.startsWith("$id|") }
+            .firstOrNull { it.startsWith("$id|") }
             ?.let { decode(it) }
     }
 
     private fun encode(book: Book): String {
         val title = Uri.encode(book.title)
         val author = Uri.encode(book.author)
-        val coverId = book.coverId?.toString().orEmpty()
-        val year = book.publishYear?.toString().orEmpty()
+        val coverIdStr = book.coverId?.toString() ?: "null"
+        val yearStr = book.publishYear?.toString() ?: "null"
 
-        return "${book.id}|$title|$author|$coverId|$year"
+        return "${book.id}|$title|$author|$coverIdStr|$yearStr"
     }
 
     private fun decode(encoded: String): Book? {
         val parts = encoded.split("|")
-
         if (parts.size < 5) return null
 
         val id = parts[0]
         val title = Uri.decode(parts[1])
         val author = Uri.decode(parts[2])
-        val coverId = parts[3].toIntOrNull()
-        val year = parts[4].toIntOrNull()
+        val coverId = if (parts[3] == "null") null else parts[3].toLongOrNull()
+        val year = if (parts[4] == "null") null else parts[4].toIntOrNull()
 
         return Book(
             id = id,

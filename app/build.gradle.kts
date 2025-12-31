@@ -57,8 +57,14 @@ dependencies {
     implementation(libs.moshi.kotlin)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.coil.compose)
+    
+    // Koin for Dependency Injection
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+
+    // Google Material for XML themes
+    implementation(libs.google.material)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

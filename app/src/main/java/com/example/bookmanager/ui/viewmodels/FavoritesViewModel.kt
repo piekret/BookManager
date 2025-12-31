@@ -11,7 +11,10 @@ class FavoritesViewModel(private val manager: FavoriteManager) : ViewModel() {
     private val _state = MutableStateFlow<UiState<List<Book>>>(UiState.Loading)
     val state: StateFlow<UiState<List<Book>>> = _state
 
-    fun load() { _state.value = UiState.Success(manager.getFavorites()) }
+    fun load() {
+        val favorites = manager.getFavorites()
+        _state.value = UiState.Success(favorites)
+    }
 
     init { load() }
 }

@@ -4,7 +4,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
@@ -12,27 +14,45 @@ import coil.compose.AsyncImage
 fun BookRow(
     title: String,
     author: String,
-    coverId: Int?,
+    coverId: Long?,
     subtitle: String? = null,
     onClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth().clickable { onClick() }
+        modifier = Modifier.fillMaxWidth().clickable { onClick() },
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Row(Modifier.padding(12.dp)) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             AsyncImage(
                 model = coverUrl(coverId, "M"),
                 contentDescription = null,
-                modifier = Modifier.size(100.dp)
+                modifier = Modifier
+                    .size(width = 70.dp, height = 100.dp),
+                contentScale = ContentScale.Crop
             )
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 2
+                )
                 Spacer(Modifier.height(4.dp))
-                Text(author, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = author,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.secondary
+                )
                 if (subtitle != null) {
-                    Spacer(Modifier.height(2.dp))
-                    Text(subtitle, style = MaterialTheme.typography.bodySmall)
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
                 }
             }
         }

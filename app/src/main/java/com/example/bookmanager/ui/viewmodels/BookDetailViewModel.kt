@@ -22,7 +22,7 @@ class BookDetailViewModel(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val workId: String = savedStateHandle["id"] ?: ""
+    private val workId: String = savedStateHandle["bookId"] ?: ""
     private val _state = MutableStateFlow<UiState<DetailUi>>(UiState.Loading)
     val state: StateFlow<UiState<DetailUi>> = _state
 
@@ -43,7 +43,7 @@ class BookDetailViewModel(
             val response = repo.detailBook(base)
             _state.value = response.fold(
                 onSuccess = { b -> UiState.Success(DetailUi(b, manager.isFavorite(b.id))) },
-                onFailure = { UiState.Error("Nie udało się pobrać szczegółów.") }
+                onFailure = { UiState.Error("Something went wrong") }
             )
         }
     }
