@@ -11,11 +11,15 @@ import com.example.bookmanager.data.model.Book
 import com.example.bookmanager.ui.common.StateHost
 import com.example.bookmanager.ui.viewmodels.HomeViewModel
 import com.example.bookmanager.ui.common.BookRow
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     vm: HomeViewModel,
+    isDarkTheme: Boolean,
+    onThemeToggle: () -> Unit,
     onBookClick: (Book) -> Unit,
     onFavoriteClick: () -> Unit
 ) {
@@ -24,10 +28,13 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Book Manager") },
+                title = { Text("BookManager") },
                 actions = { 
-                    TextButton(onClick = onFavoriteClick) { 
-                        Text("Favorites") 
+                    IconButton(onClick = onThemeToggle) {
+                        Text(text = if (isDarkTheme) "☀️" else "🌙")
+                    }
+                    IconButton(onClick = onFavoriteClick) { 
+                        Icon(Icons.Default.Favorite, contentDescription = "Favorites")
                     } 
                 }
             )

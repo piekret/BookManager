@@ -15,7 +15,10 @@ import com.example.bookmanager.ui.navigation.Screen
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun AppNavGraph() {
+fun AppNavGraph(
+    isDarkTheme: Boolean,
+    onThemeToggle: () -> Unit
+) {
     val navController = rememberNavController()
 
     NavHost(
@@ -27,6 +30,8 @@ fun AppNavGraph() {
         composable(Screen.Home.route) {
             HomeScreen(
                 vm = koinViewModel(),
+                isDarkTheme = isDarkTheme,
+                onThemeToggle = onThemeToggle,
                 onBookClick = { book ->
                     navController.navigate(Screen.Detail.createRoute(book.id))
                 },
