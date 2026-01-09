@@ -6,12 +6,32 @@ import com.example.bookmanager.data.model.*
 class BookRepository(private val api: OpenLibraryApi) {
     private val bookCache = mutableMapOf<String, Book>()
 
-    suspend fun getFictionBooks(limit: Int = 20): Result<List<Book>> = runCatching {
-        val response = api.fiction(limit)
+    suspend fun getFictionBooks(limit: Int = 20, offset: Int = 0): Result<List<Book>> = runCatching {
+        val response = api.fiction(limit, offset)
         val books = response.works.mapNotNull { dto ->
             val id = dto.key.removePrefix("/works/").trim()
             val title = dto.title ?: return@mapNotNull null
             val author = dto.authors?.firstOrNull()?.name ?: "Unnamed author"
+
+            Book(
+                id = id,
+                title = title,
+                author = author,
+                coverId = dto.coverId,
+                publishYear = dto.firstPublishYear,
+                publishDate = null,
+                description = null
+            ).also { bookCache[it.id] = it }
+        }
+        books
+    }
+
+    suspend fun searchBooks(query: String, page: Int = 1, limit: Int = 20): Result<List<Book>> = runCatching {
+        val response = api.search(query, page, limit)
+        val books = response.docs.mapNotNull { dto ->
+            val id = dto.key.removePrefix("/works/").trim()
+            val title = dto.title ?: return@mapNotNull null
+            val author = dto.authorNames?.firstOrNull() ?: "Unnamed author"
 
             Book(
                 id = id,

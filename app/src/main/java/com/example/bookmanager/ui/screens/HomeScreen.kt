@@ -13,6 +13,11 @@ import com.example.bookmanager.ui.viewmodels.HomeViewModel
 import com.example.bookmanager.ui.common.BookRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,25 +29,58 @@ fun HomeScreen(
     onFavoriteClick: () -> Unit
 ) {
     val state by vm.state.collectAsState()
+    var searchQuery by remember { mutableStateOf("") }
+    val listState = rememberLazyListState()
+
+    val shouldLoadMore by remember {
+        derivedStateOf {
+            val totalItems = listState.layoutInfo.totalItemsCount
+            val lastVisibleItemIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            totalItems > 0 && lastVisibleItemIndex >= totalItems - 2
+        }
+    }
+
+    LaunchedEffect(shouldLoadMore) {
+        if (shouldLoadMore) {
+            vm.loadMore()
+        }
+    }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("BookManager") },
-                actions = { 
-                    IconButton(onClick = onThemeToggle) {
-                        Text(text = if (isDarkTheme) "☀️" else "🌙")
+            Column {
+                TopAppBar(
+                    title = { Text("BookManager") },
+                    actions = {
+                        IconButton(onClick = onThemeToggle) {
+                            Text(text = if (isDarkTheme) "☀️" else "🌙")
+                        }
+                        IconButton(onClick = onFavoriteClick) {
+                            Icon(Icons.Default.Favorite, contentDescription = "Favorites")
+                        }
                     }
-                    IconButton(onClick = onFavoriteClick) { 
-                        Icon(Icons.Default.Favorite, contentDescription = "Favorites")
-                    } 
-                }
-            )
+                )
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    placeholder = { Text("Search books...") },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(onSearch = {
+                        vm.search(searchQuery)
+                    }),
+                    singleLine = true
+                )
+            }
         }
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-            StateHost(state = state, onRetry = { vm.load() }) { books ->
+            StateHost(state = state, onRetry = { vm.loadInitial() }) { books ->
                 LazyColumn(
+                    state = listState,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)

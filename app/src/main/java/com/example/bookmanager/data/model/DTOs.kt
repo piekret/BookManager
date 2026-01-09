@@ -31,3 +31,15 @@ data class AuthorRefDto(
     val author: AuthorDto? = null,
     val name: String? = null
 )
+
+data class SearchResponse(
+    val docs: List<SearchDocDto> = emptyList()
+)
+
+data class SearchDocDto(
+    val key: String,
+    val title: String? = null,
+    @Json(name = "author_name") val authorNames: List<String>? = null,
+    @Json(name = "cover_i") val coverId: Long? = null,
+    @Json(name = "first_publish_year") val firstPublishYear: Int? = null
+)
